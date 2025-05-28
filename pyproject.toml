@@ -1,0 +1,15 @@
+[project]
+name = "eraser-io-mcp-server"
+version = "1.0.0"
+description = "MCP server for rendering diagrams using Eraser API"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp[cli]>=1.9.1",
+    "python-dotenv>=1.1.0",
+    "requests>=2.32.3",
+]
+
+[tool.setuptools]
+py-modules = ["main", "server", "render_eraser_diagram"]
