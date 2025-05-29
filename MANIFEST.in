@@ -1,0 +1,5 @@
+include README.md
+include MCP_USAGE.md
+include LICENSE
+include eraser_io_mcp_server/eraser-standard-icons.csv
+include eraser_io_mcp_server/*.py

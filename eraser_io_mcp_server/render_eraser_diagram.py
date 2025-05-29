@@ -17,7 +17,7 @@ import json
 import re
 import csv
 from dotenv import load_dotenv
-from server import mcp
+from .server import mcp
 
 # Load environment variables
 load_dotenv()

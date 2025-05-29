@@ -36,7 +36,7 @@ Issues = "https://github.com/buck-0x/eraser-io-mcp-server/issues"
 
 [project.scripts]
 eraser-diagram = "eraser_io_mcp_server.render_eraser_diagram:main"
-eraser-mcp-server = "eraser_io_mcp_server.server:main"
+eraser-mcp-server = "eraser_io_mcp_server.main:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
