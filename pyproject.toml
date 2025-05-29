@@ -1,15 +1,43 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "eraser-io-mcp-server"
 version = "1.0.0"
 description = "MCP server for rendering diagrams using Eraser API"
 readme = "README.md"
-license = "MIT"
+license = {text = "MIT"}
 requires-python = ">=3.10"
+authors = [
+    {name = "Your Name", email = "buck_0x@proton.me"}
+]
+keywords = ["mcp", "eraser", "diagram", "rendering", "api"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
 dependencies = [
     "mcp[cli]>=1.9.1",
     "python-dotenv>=1.1.0",
     "requests>=2.32.3",
 ]
 
-[tool.setuptools]
-py-modules = ["main", "server", "render_eraser_diagram"]
+[project.urls]
+Homepage = "https://github.com/buck-0x/eraser-io-mcp-server"
+Repository = "https://github.com/buck-0x/eraser-io-mcp-server"
+Issues = "https://github.com/buck-0x/eraser-io-mcp-server/issues"
+
+[project.scripts]
+eraser-diagram = "eraser_io_mcp_server.render_eraser_diagram:main"
+eraser-mcp-server = "eraser_io_mcp_server.server:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["eraser_io_mcp_server*"]
