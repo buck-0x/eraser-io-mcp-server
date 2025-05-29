@@ -82,7 +82,7 @@ def render_diagram(
         return_file (bool): Whether to return the file content (defaults to False)
         background (bool): Whether to include background (defaults to True)
         theme (str): Theme to use - "light" or "dark" (defaults to "light")
-        scale (str): Scale factor for the diagram (defaults to "1")
+        scale (str): Scale factor for the diagram - "1", "2", or "3" (defaults to "1")
 
     Returns:
         dict: Response containing success status, image data/URL, and message
@@ -94,6 +94,13 @@ def render_diagram(
         return {
             "success": False,
             "message": "Error: ERASER_API_TOKEN not found in environment",
+        }
+    
+    # Validate scale parameter
+    if str(scale) not in ["1", "2", "3"]:
+        return {
+            "success": False,
+            "message": f"Error: Invalid scale value '{scale}'. Must be '1', '2', or '3'",
         }
 
     # Process the code to handle escape sequences
@@ -138,14 +145,12 @@ def render_diagram(
         background_value = background_str in ['true', '1', 'yes']
     else:
         background_value = bool(background)
-    
+
     if isinstance(return_file, str):
         return_file_str = remove_quotes(return_file).lower()
-        return_file_value = return_file_str in ['true', '1', 'yes']
+        return_file_value = return_file_str in ["true", "1", "yes"]
     else:
         return_file_value = bool(return_file)
-    
-    scale_value = remove_quotes(str(scale))
 
     payload = {
         "elements": [
@@ -153,7 +158,7 @@ def render_diagram(
         ],
         "background": background_value,
         "theme": theme,
-        "scale": scale_value,
+        "scale": scale,
         "returnFile": return_file_value,
     }
 
@@ -259,7 +264,10 @@ Examples:
         help="Theme for the diagram (defaults to light)",
     )
     parser.add_argument(
-        "--scale", default="1", help="Scale factor for the diagram (defaults to 1)"
+        "--scale", 
+        choices=["1", "2", "3"],
+        default="1", 
+        help="Scale factor for the diagram: 1, 2, or 3 (defaults to 1)"
     )
     parser.add_argument(
         "--return-file",

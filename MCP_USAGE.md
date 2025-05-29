@@ -67,13 +67,13 @@ Once configured, you can use the `render_diagram` tool in Claude Desktop to gene
 - `diagram_type` (required): Type of diagram to render
   - `sequence-diagram`
   - `cloud-architecture-diagram`
-  - `flowchart`
+  - `flowchart-diagram`
   - `entity-relationship-diagram`
 - `code` (required): Diagram code in Eraser syntax
 - `return_file` (optional, default: false): Whether to return base64 image data
 - `background` (optional, default: false): Include background in diagram
 - `theme` (optional, default: "light"): Choose "light" or "dark" theme
-- `scale` (optional, default: "1"): Scale factor (1.0-5.0)
+- `scale` (optional, default: "1"): Scale factor - "1", "2", or "3"
 
 **Known Issue**: The Eraser API has a caching bug where images are cached based only on the diagram code. Changing `theme` or `background` parameters without changing the code will return the previously cached image instead of generating a new one with the updated settings.
 

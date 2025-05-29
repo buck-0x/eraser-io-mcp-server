@@ -1,4 +1,4 @@
-# Eraser Diagram Renderer
+# tEraser Diagram Renderer
 
 A Python MCP (Model Context Protocol) server and CLI tool to render diagrams using the [Eraser](https://www.eraser.io/) API.
 
@@ -53,7 +53,7 @@ If undefined icons are detected:
 - `--return-file`: Return base64-encoded image data instead of URL (defaults to False)
 - `--background`: Include background (defaults to False)
 - `--theme`: Choose "light" or "dark" theme (defaults to "light")
-- `--scale`: Scale factor from 1.0 to 5.0 (defaults to "1")
+- `--scale`: Scale factor - "1", "2", or "3" (defaults to "1")
 
 **Note**: Due to a bug in the Eraser API, the image cache is only invalidated when the diagram code changes. Changes to `theme` or `background` parameters alone will not generate a new image if the same code was previously rendered with different settings.
 
@@ -151,7 +151,7 @@ DEBUG=1 python render_eraser_diagram.py --diagram-type sequence-diagram \
 
 - `sequence-diagram`
 - `cloud-architecture-diagram`
-- `flowchart`
+- `flowchart-diagram`
 - `entity-relationship-diagram`
 - And more (check [Eraser Diagram-as-code documentation](https://docs.eraser.io/docs/diagram-as-code))
 
@@ -163,11 +163,13 @@ DEBUG=1 python render_eraser_diagram.py --diagram-type sequence-diagram \
 ## Installation
 
 Using pip:
+
 ```bash
 pip install -e .
 ```
 
 Using uv (fast Python package manager):
+
 ```bash
 uv pip install -e .
 ```
