@@ -24,50 +24,53 @@ load_dotenv()
 
 # Load standard icons from CSV
 STANDARD_ICONS = set()
-icon_csv_path = os.path.join(os.path.dirname(__file__), 'eraser-standard-icons.csv')
+icon_csv_path = os.path.join(os.path.dirname(__file__), "eraser-standard-icons.csv")
 if os.path.exists(icon_csv_path):
-    with open(icon_csv_path, 'r') as f:
+    with open(icon_csv_path, "r") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            if 'icon_name' in row:
-                STANDARD_ICONS.add(row['icon_name'])
+            if "icon_name" in row:
+                STANDARD_ICONS.add(row["icon_name"])
+
 
 def check_undefined_icons(code):
     """
     Check for icon references in the code that are not in the standard icons list.
-    
+
     Args:
         code (str): The diagram code to check
-        
+
     Returns:
         list: List of undefined icon names found in the code
     """
-    if os.getenv('SKIP_ICON_CHECK') == 'true':
+    if os.getenv("SKIP_ICON_CHECK") == "true":
         return []
-    
+
     # Pattern to match icon references
-    # Icons are referenced with "icon: icon-name" syntax
-    icon_pattern = r'"icon:\s*([^"]+)"'
-    
+    # Icons can be referenced as icon: icon-name or "icon: icon-name"
+    icon_pattern = r'(?:"icon:\s*([^"]+)"|icon:\s*([^\s\],]+))'
+
     # Find all icon references in the code
     icon_matches = re.findall(icon_pattern, code, re.IGNORECASE)
-    
+
     # Clean up icon names and check against standard list
     undefined_icons = []
-    for icon_ref in icon_matches:
-        icon_name = icon_ref.strip()
+    for match in icon_matches:
+        # Handle tuple from regex groups (quoted, unquoted)
+        icon_name = (match[0] or match[1]).strip()
         if icon_name and icon_name not in STANDARD_ICONS:
             undefined_icons.append(icon_name)
-    
+
     return list(set(undefined_icons))  # Remove duplicates
+
 
 @mcp.tool()
 def render_diagram(
     diagram_type,
     code,
     return_file=False,
-    background=False,
-    theme="dark",
+    background=True,
+    theme="light",
     scale="1",
 ):
     """
@@ -77,8 +80,8 @@ def render_diagram(
         diagram_type (str): Type of diagram (e.g., 'sequence-diagram', 'cloud-architecture-diagram')
         code (str): Diagram code in Eraser.io syntax (with proper line breaks and escaping)
         return_file (bool): Whether to return the file content (defaults to False)
-        background (bool): Whether to include background (defaults to False)
-        theme (str): Theme to use - "light" or "dark" (defaults to "dark")
+        background (bool): Whether to include background (defaults to True)
+        theme (str): Theme to use - "light" or "dark" (defaults to "light")
         scale (str): Scale factor for the diagram (defaults to "1")
 
     Returns:
@@ -86,28 +89,28 @@ def render_diagram(
     """
 
     # Get API token from environment
-    api_token = os.getenv('ERASER_API_TOKEN')
+    api_token = os.getenv("ERASER_API_TOKEN")
     if not api_token:
         return {
             "success": False,
-            "message": "Error: ERASER_API_TOKEN not found in environment"
+            "message": "Error: ERASER_API_TOKEN not found in environment",
         }
-    
+
     # Process the code to handle escape sequences
     # Convert literal \n to actual newlines
-    processed_code = code.replace('\\n', '\n')
+    processed_code = code.replace("\\n", "\n")
     # Handle other common escape sequences
-    processed_code = processed_code.replace('\\t', '\t')
-    processed_code = processed_code.replace('\\r', '\r')
+    processed_code = processed_code.replace("\\t", "\t")
+    processed_code = processed_code.replace("\\r", "\r")
     processed_code = processed_code.replace('\\"', '"')
     processed_code = processed_code.replace("\\'", "'")
-    processed_code = processed_code.replace('\\\\', '\\')
-    
+    processed_code = processed_code.replace("\\\\", "\\")
+
     # Debug output to show processed code
-    if os.getenv('DEBUG'):
+    if os.getenv("DEBUG"):
         print(f"Processed code:\n{processed_code}")
         print(f"Code length: {len(processed_code)} characters")
-    
+
     # Check for undefined icons
     undefined_icons = check_undefined_icons(processed_code)
     warning_message = None
@@ -117,45 +120,73 @@ def render_diagram(
             f"{', '.join(undefined_icons)}. These icons may not render correctly. "
             f"You can disable this warning by setting SKIP_ICON_CHECK=true."
         )
-    
+
     # Prepare API request
     url = "https://app.eraser.io/api/render/elements"
+
+    # Helper function to remove quotes from string parameters
+    def remove_quotes(value):
+        value = str(value).lower()
+        if value.startswith('"') and value.endswith('"'):
+            return value[1:-1]
+        return value
+
+    # Process parameters - remove quotes if present
+    # Convert string booleans to actual booleans
+    if isinstance(background, str):
+        background_str = remove_quotes(background).lower()
+        background_value = background_str in ['true', '1', 'yes']
+    else:
+        background_value = bool(background)
     
+    if isinstance(return_file, str):
+        return_file_str = remove_quotes(return_file).lower()
+        return_file_value = return_file_str in ['true', '1', 'yes']
+    else:
+        return_file_value = bool(return_file)
+    
+    scale_value = remove_quotes(str(scale))
+
+    # Process theme - add escaped quotes if not already present
+    theme_value = theme
+    if not (theme_value.startswith('"') and theme_value.endswith('"')):
+        theme_value = f'"{theme}"'
+
     payload = {
         "elements": [
             {"type": "diagram", "diagramType": diagram_type, "code": processed_code}
         ],
-        "background": background,
-        "theme": theme,
-        "scale": scale,
-        "returnFile": return_file,
+        "background": background_value,
+        "theme": theme_value,
+        "scale": scale_value,
+        "returnFile": return_file_value,
     }
-    
+
     headers = {
         "accept": "application/json",
         "content-type": "application/json",
-        "authorization": f"Bearer {api_token}"
+        "authorization": f"Bearer {api_token}",
     }
-    
+
     try:
         # Make API request
         response = requests.post(url, json=payload, headers=headers)
-        
+
         # Check response status
         if response.status_code != 200:
             return {
                 "success": False,
-                "message": f"API request failed with status code {response.status_code}: {response.text}"
+                "message": f"API request failed with status code {response.status_code}: {response.text}",
             }
-        
+
         # Handle response based on returnFile parameter
         if return_file:
             # Return the binary image data
-            image_blob = base64.b64encode(response.content).decode('utf-8')
+            image_blob = base64.b64encode(response.content).decode("utf-8")
             result = {
                 "success": True,
                 "image_blob": image_blob,
-                "message": f"Successfully rendered {diagram_type} diagram"
+                "message": f"Successfully rendered {diagram_type} diagram",
             }
             if warning_message:
                 result["warning"] = warning_message
@@ -163,13 +194,10 @@ def render_diagram(
         else:
             # Parse JSON response to get image URL
             response_data = response.json()
-            image_url = response_data.get('imageUrl', '')
-            create_eraser_file_url = response_data.get('createEraserFileUrl', '')
+            image_url = response_data.get("imageUrl", "")
+            create_eraser_file_url = response_data.get("createEraserFileUrl", "")
             if not image_url:
-                return {
-                    "success": False,
-                    "message": "No image URL returned from API"
-                }
+                return {"success": False, "message": "No image URL returned from API"}
             result = {
                 "success": True,
                 "image_url": image_url,
@@ -179,57 +207,74 @@ def render_diagram(
             if warning_message:
                 result["warning"] = warning_message
             return result
-        
+
     except requests.exceptions.RequestException as e:
         return {
             "success": False,
-            "message": f"Failed to connect to Eraser.io API: {str(e)}"
+            "message": f"Failed to connect to Eraser.io API: {str(e)}",
         }
     except Exception as e:
-        return {
-            "success": False,
-            "message": f"An unexpected error occurred: {str(e)}"
-        }
+        return {"success": False, "message": f"An unexpected error occurred: {str(e)}"}
+
 
 def main():
     """Main function to handle command line arguments."""
     parser = argparse.ArgumentParser(
-        description='Render diagrams using the Eraser.io API',
+        description="Render diagrams using the Eraser.io API",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog='''
+        epilog="""
 Examples:
   # Simple sequence diagram (returns URL)
   python render_eraser_diagram.py --diagram-type sequence-diagram --code "Alice -> Bob: Hello"
-  
+
   # Return file content as base64
   python render_eraser_diagram.py --diagram-type sequence-diagram --code "Alice -> Bob: Hello" --return-file
-  
+
   # Multi-line sequence diagram (use \\n for line breaks)
   python render_eraser_diagram.py --diagram-type sequence-diagram --code "Alice -> Bob: Hello\\nBob -> Alice: Hi there\\nAlice -> Bob: How are you?"
-  
+
   # Cloud architecture with light theme and background
   python render_eraser_diagram.py --diagram-type cloud-architecture-diagram --code "AWS S3 Bucket\\n|\\nAWS Lambda" --theme light --background
-  
+
   # Enable debug mode to see processed code
   DEBUG=1 python render_eraser_diagram.py --diagram-type sequence-diagram --code "A -> B: Test\\nB -> C: Response"
-        '''
+        """,
     )
-    
-    parser.add_argument('--diagram-type', required=True, 
-                        help='Type of diagram (e.g., sequence-diagram, cloud-architecture-diagram)')
-    parser.add_argument('--code', required=True, 
-                        help='Diagram code in Eraser.io syntax (use \\n for line breaks)')
-    parser.add_argument('--background', action='store_true', default=False,
-                        help='Include background in the diagram (defaults to False)')
-    parser.add_argument('--theme', choices=['light', 'dark'], default='dark',
-                        help='Theme for the diagram (defaults to dark)')
-    parser.add_argument('--scale', default='1',
-                        help='Scale factor for the diagram (defaults to 1)')
-    parser.add_argument('--return-file', action='store_true', default=False,
-                        help='Return the file content as base64 instead of URL (defaults to False)')
-    
+
+    parser.add_argument(
+        "--diagram-type",
+        required=True,
+        help="Type of diagram (e.g., sequence-diagram, cloud-architecture-diagram)",
+    )
+    parser.add_argument(
+        "--code",
+        required=True,
+        help="Diagram code in Eraser.io syntax (use \\n for line breaks)",
+    )
+    parser.add_argument(
+        "--background",
+        action="store_true",
+        default=True,
+        help="Include background in the diagram (defaults to True)",
+    )
+    parser.add_argument(
+        "--theme",
+        choices=['"light"', '"dark"'],
+        default='"light"',
+        help="Theme for the diagram (defaults to light)",
+    )
+    parser.add_argument(
+        "--scale", default="1", help="Scale factor for the diagram (defaults to 1)"
+    )
+    parser.add_argument(
+        "--return-file",
+        action="store_true",
+        default=False,
+        help="Return the file content as base64 instead of URL (defaults to False)",
+    )
+
     args = parser.parse_args()
-    
+
     # Render the diagram
     result = render_diagram(
         diagram_type=args.diagram_type,
@@ -237,14 +282,15 @@ Examples:
         return_file=args.return_file,
         background=args.background,
         theme=args.theme,
-        scale=args.scale
+        scale=args.scale,
     )
-    
+
     # Output the result as JSON
     print(json.dumps(result, indent=2))
-    
+
     # Exit with appropriate code
-    sys.exit(0 if result['success'] else 1)
+    sys.exit(0 if result["success"] else 1)
+
 
 if __name__ == "__main__":
     main()

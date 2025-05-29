@@ -1,6 +1,6 @@
-# Using Eraser MCP Server with Claude Code
+# Using Eraser MCP Server with Claude Desktop
 
-This guide explains how to use the Eraser MCP server with Claude Code to generate diagrams programmatically.
+This guide explains how to use the Eraser MCP server with Claude Desktop to generate diagrams programmatically.
 
 ## Setup
 
@@ -8,11 +8,15 @@ This guide explains how to use the Eraser MCP server with Claude Code to generat
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/buck-0x/eraser-io-mcp-server
 cd eraser-io-mcp-server
 
 # Install dependencies
+# Using uv (fast Python package manager)
 uv pip install -e .
+
+# Or using standard pip
+pip install -e .
 ```
 
 ### 2. Get Your Eraser API Token
@@ -54,9 +58,9 @@ Add the MCP server to your Claude Desktop configuration file:
 
 **Note**: If you set the token in the Claude Desktop config (recommended), you don't need a `.env` file. The token in the config takes precedence.
 
-## Using the MCP Tool in Claude Code
+## Using the MCP Tool in Claude Desktop
 
-Once configured, you can use the `render_diagram` tool in Claude Code to generate diagrams.
+Once configured, you can use the `render_diagram` tool in Claude Desktop to generate diagrams.
 
 ### Tool Parameters
 
@@ -71,7 +75,7 @@ Once configured, you can use the `render_diagram` tool in Claude Code to generat
 - `theme` (optional, default: "dark"): Choose "light" or "dark" theme
 - `scale` (optional, default: "1"): Scale factor (1.0-5.0)
 
-### Example Usage in Claude Code
+### Example Usage in Claude Desktop
 
 #### Basic Sequence Diagram (returns URL)
 
@@ -99,6 +103,8 @@ Response:
 }
 ```
 
+Note: If undefined icons are detected, you may also see a `warning` field in the response.
+
 #### Cloud Architecture Diagram with File Content
 
 ```
@@ -123,17 +129,17 @@ Response:
 {
   "success": true,
   "image_blob": "iVBORw0KGgoAAAANSUhEUgA...",
-  "create_eraser_file_url": "https://app.eraser.io/workspace/...",
   "message": "Successfully rendered cloud-architecture-diagram diagram"
 }
 ```
 
-### Tips for Claude Code Usage
+### Tips for Claude Desktop Usage
 
 1. **Diagram Code Formatting**: Use `\n` for line breaks in your diagram code
 2. **Special Characters**: Escape quotes and backslashes properly
 3. **Token Management**: The token is automatically loaded from the environment - no need to pass it explicitly
 4. **File Handling**: When `return_file=True`, you'll get base64 data that Claude can save to a file
+5. **Icon Validation**: The tool validates icon references and warns about undefined icons. Set `SKIP_ICON_CHECK=true` in the environment to disable this
 
 ### Common Diagram Types
 
@@ -179,7 +185,21 @@ ECS Cluster -> RDS Database
 2. **Authentication Error**: Verify your ERASER_API_TOKEN is correct
 3. **Diagram Syntax Error**: Check Eraser documentation for correct syntax
 4. **No Response**: Enable debug mode with `DEBUG=1` in the environment
-5. **Python Version Error**: Ensure you have Python 3.13 or higher installed
+   ```json
+   {
+     "mcpServers": {
+       "eraser": {
+         "command": "python",
+         "args": ["/path/to/eraser-io-mcp-server/main.py"],
+         "env": {
+           "ERASER_API_TOKEN": "your_token_here",
+           "DEBUG": "1"
+         }
+       }
+     }
+   }
+   ```
+5. **Python Version Error**: Ensure you have Python 3.10 or higher installed
 
 ## Advanced Usage
 
