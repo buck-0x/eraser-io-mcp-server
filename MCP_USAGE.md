@@ -1,8 +1,8 @@
-# Using Eraser MCP Server with Claude Desktop
+# Using Eraser MCP Server
 
-This guide explains how to use the Eraser MCP server with Claude Desktop to generate diagrams programmatically.
+This guide explains how to use the Eraser MCP server to generate diagrams programmatically.
 
-## Setup
+## Local Setup
 
 ### 1. Install the MCP Server
 
@@ -33,7 +33,9 @@ Create a `.env` file in the project directory:
 ERASER_API_TOKEN=your_token_here
 ```
 
-### 3. Configure Claude Desktop
+### 3. Configure Host
+
+#### Claude Desktop
 
 **Important**: Requires Python 3.10 or higher.
 
@@ -58,9 +60,9 @@ Add the MCP server to your Claude Desktop configuration file:
 
 **Note**: If you set the token in the Claude Desktop config (recommended), you don't need a `.env` file. The token in the config takes precedence.
 
-## Using the MCP Tool in Claude Desktop
+## Using the MCP Tool
 
-Once configured, you can use the `render_diagram` tool in Claude Desktop to generate diagrams.
+Once configured, you can use the `render_diagram` tool in your client to generate diagrams.
 
 ### Tool Parameters
 
@@ -77,7 +79,7 @@ Once configured, you can use the `render_diagram` tool in Claude Desktop to gene
 
 **Known Issue**: The Eraser API has a caching bug where images are cached based only on the diagram code. Changing `theme` or `background` parameters without changing the code will return the previously cached image instead of generating a new one with the updated settings.
 
-### Example Usage in Claude Desktop
+### Example Usage
 
 #### Basic Sequence Diagram (returns URL)
 
@@ -85,7 +87,7 @@ Once configured, you can use the `render_diagram` tool in Claude Desktop to gene
 Please create a sequence diagram showing a user login flow using the Eraser tool.
 ```
 
-Claude will use:
+The host will use:
 
 ```python
 render_diagram(
@@ -107,13 +109,13 @@ Response:
 
 Note: If undefined icons are detected, you may also see a `warning` field in the response.
 
-#### Cloud Architecture Diagram with File Content
+##### Cloud Architecture Diagram with File Content
 
 ```
 Create a cloud architecture diagram for a serverless app and return the image file content.
 ```
 
-Claude will use:
+The host will use:
 
 ```python
 render_diagram(
@@ -135,7 +137,7 @@ Response:
 }
 ```
 
-### Tips for Claude Desktop Usage
+### Tips
 
 1. **Diagram Code Formatting**: Use `\n` for line breaks in your diagram code
 2. **Special Characters**: Escape quotes and backslashes properly
@@ -183,7 +185,7 @@ ECS Cluster -> RDS Database
 
 ## Troubleshooting
 
-1. **MCP Not Available**: Restart Claude Desktop after updating configuration
+1. **MCP Not Available**: Restart the MCP server in your host after updating configuration
 2. **Authentication Error**: Verify your ERASER_API_TOKEN is correct
 3. **Diagram Syntax Error**: Check Eraser documentation for correct syntax
 4. **No Response**: Enable debug mode with `DEBUG=1` in the environment
@@ -207,7 +209,7 @@ ECS Cluster -> RDS Database
 
 ### Batch Diagram Generation
 
-You can ask Claude to generate multiple related diagrams:
+You can ask your host (e.g. Claude Desktop) to generate multiple related diagrams:
 
 ```
 Create a complete system design with:
@@ -216,7 +218,7 @@ Create a complete system design with:
 3. A cloud architecture diagram for the deployment
 ```
 
-Claude will call the tool multiple times with appropriate parameters for each diagram type.
+The host will call the tool multiple times with appropriate parameters for each diagram type.
 
 ### Custom Themes and Styling
 
