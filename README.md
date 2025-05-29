@@ -52,8 +52,10 @@ If undefined icons are detected:
 - `--code` (required): Diagram code in Eraser syntax
 - `--return-file`: Return base64-encoded image data instead of URL (defaults to False)
 - `--background`: Include background (defaults to False)
-- `--theme`: Choose "light" or "dark" theme (defaults to "dark")
+- `--theme`: Choose "light" or "dark" theme (defaults to "light")
 - `--scale`: Scale factor from 1.0 to 5.0 (defaults to "1")
+
+**Note**: Due to a bug in the Eraser API, the image cache is only invalidated when the diagram code changes. Changes to `theme` or `background` parameters alone will not generate a new image if the same code was previously rendered with different settings.
 
 ## Authentication
 

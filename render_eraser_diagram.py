@@ -147,17 +147,12 @@ def render_diagram(
     
     scale_value = remove_quotes(str(scale))
 
-    # Process theme - add escaped quotes if not already present
-    theme_value = theme
-    if not (theme_value.startswith('"') and theme_value.endswith('"')):
-        theme_value = f'"{theme}"'
-
     payload = {
         "elements": [
             {"type": "diagram", "diagramType": diagram_type, "code": processed_code}
         ],
         "background": background_value,
-        "theme": theme_value,
+        "theme": theme,
         "scale": scale_value,
         "returnFile": return_file_value,
     }
@@ -259,8 +254,8 @@ Examples:
     )
     parser.add_argument(
         "--theme",
-        choices=['"light"', '"dark"'],
-        default='"light"',
+        choices=["light", "dark"],
+        default="light",
         help="Theme for the diagram (defaults to light)",
     )
     parser.add_argument(
