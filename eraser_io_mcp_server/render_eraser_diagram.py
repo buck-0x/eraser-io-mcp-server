@@ -103,15 +103,14 @@ def render_diagram(
             "message": f"Error: Invalid scale value '{scale}'. Must be '1', '2', or '3'",
         }
 
-    # Process the code to handle escape sequences
-    # Convert literal \n to actual newlines
-    processed_code = code.replace("\\n", "\n")
-    # Handle other common escape sequences
-    processed_code = processed_code.replace("\\t", "\t")
-    processed_code = processed_code.replace("\\r", "\r")
-    processed_code = processed_code.replace('\\"', '"')
-    processed_code = processed_code.replace("\\'", "'")
-    processed_code = processed_code.replace("\\\\", "\\")
+    # Process the code to handle escape sequences using unicode_escape decoding
+    try:
+        processed_code = code.encode('utf-8').decode('unicode_escape')
+    except Exception as e:
+        return {
+            "success": False,
+            "message": f"Error decoding escape sequences: {e}",
+        }
 
     # Debug output to show processed code
     if os.getenv("DEBUG"):
