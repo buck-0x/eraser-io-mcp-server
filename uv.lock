@@ -120,7 +120,7 @@ wheels = [
 [[package]]
 name = "eraser-io-mcp-server"
 version = "1.0.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "mcp", extra = ["cli"] },
     { name = "python-dotenv" },
