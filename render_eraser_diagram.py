@@ -236,7 +236,7 @@ Examples:
   python render_eraser_diagram.py --diagram-type sequence-diagram --code "Alice -> Bob: Hello\\nBob -> Alice: Hi there\\nAlice -> Bob: How are you?"
 
   # Cloud architecture with light theme and background
-  python render_eraser_diagram.py --diagram-type cloud-architecture-diagram --code "AWS S3 Bucket\\n|\\nAWS Lambda" --theme light --background
+  python render_eraser_diagram.py --diagram-type cloud-architecture-diagram --code "AWS S3 Bucket\\n|\\nAWS Lambda" --theme light
 
   # Enable debug mode to see processed code
   DEBUG=1 python render_eraser_diagram.py --diagram-type sequence-diagram --code "A -> B: Test\\nB -> C: Response"

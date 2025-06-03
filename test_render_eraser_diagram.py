@@ -177,7 +177,7 @@ def test_cli_interface():
             "light",
             "--scale",
             "2",
-            "--background",
+            "--no-background",
             "--return-file",
         ],
         capture_output=True,

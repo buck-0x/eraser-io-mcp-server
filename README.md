@@ -51,7 +51,7 @@ If undefined icons are detected:
 - `--diagram-type` (required): Type of diagram (e.g., sequence-diagram, cloud-architecture-diagram)
 - `--code` (required): Diagram code in Eraser syntax
 - `--return-file`: Return base64-encoded image data instead of URL (defaults to False)
-- `--background`: Include background (defaults to False)
+- `--no-background`: Disable background (defaults to background enabled)
 - `--theme`: Choose "light" or "dark" theme (defaults to "light")
 - `--scale`: Scale factor - "1", "2", or "3" (defaults to "1")
 
@@ -137,7 +137,7 @@ Output:
 
 ```bash
 python render_eraser_diagram.py --diagram-type cloud-architecture-diagram \
-  --code "AWS S3 Bucket\n|\nAWS Lambda" --theme light --background
+  --code "AWS S3 Bucket\n|\nAWS Lambda" --theme light
 ```
 
 ### Debug mode to see processed code:

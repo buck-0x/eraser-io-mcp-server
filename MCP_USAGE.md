@@ -73,7 +73,7 @@ Once configured, you can use the `render_diagram` tool in your client to generat
   - `entity-relationship-diagram`
 - `code` (required): Diagram code in Eraser syntax
 - `return_file` (optional, default: false): Whether to return base64 image data
-- `background` (optional, default: false): Include background in diagram
+- `background` (optional, default: true): Include background in diagram
 - `theme` (optional, default: "light"): Choose "light" or "dark" theme
 - `scale` (optional, default: "1"): Scale factor - "1", "2", or "3"
 
