@@ -1,4 +1,4 @@
-# tEraser Diagram Renderer
+# Eraser Diagram Renderer
 
 A Python MCP (Model Context Protocol) server and CLI tool to render diagrams using the [Eraser](https://www.eraser.io/) API.
 
