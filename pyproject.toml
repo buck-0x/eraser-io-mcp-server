@@ -10,7 +10,7 @@ readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"
 authors = [
-    {name = "Your Name", email = "buck_0x@proton.me"}
+    {name = "buck-0x", email = "buck_0x@proton.me"}
 ]
 keywords = ["mcp", "eraser", "diagram", "rendering", "api"]
 classifiers = [
