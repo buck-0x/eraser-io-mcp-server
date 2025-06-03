@@ -6,19 +6,17 @@ This script tests various functionalities of the render_eraser_diagram module.
 Requires ERASER_API_TOKEN to be set in environment or .env file.
 """
 
-import os
-import sys
 import json
+import os
 import subprocess
-import tempfile
-import base64
+import sys
 from pathlib import Path
 
 # Add the current directory to Python path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from render_eraser_diagram import render_diagram, check_undefined_icons
 from dotenv import load_dotenv
+from render_eraser_diagram import check_undefined_icons, render_diagram
 
 # Load environment variables
 load_dotenv()
@@ -88,7 +86,7 @@ def test_render_diagram_function():
 
     # Test with file return
     result_file = render_diagram(
-        diagram_type="flowchart",
+        diagram_type="flowchart-diagram",
         code="Start -> Process -> End",
         return_file=True,
         background=True,
