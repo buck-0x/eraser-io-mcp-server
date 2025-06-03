@@ -23,8 +23,8 @@ pip install -e .
 
 You'll need an API token from Eraser. You can set it in one of two ways:
 
-**Option A: Environment Variable in Claude Desktop Config (Recommended)**
-Set it directly in the Claude Desktop configuration (see step 3).
+**Option A: Environment Variable in the host config (Recommended)**
+Set it directly in the host configuration json (see step 3).
 
 **Option B: Local .env File**
 Create a `.env` file in the project directory:
@@ -35,14 +35,17 @@ ERASER_API_TOKEN=your_token_here
 
 ### 3. Configure Host
 
-#### Claude Desktop
-
 **Important**: Requires Python 3.10 or higher.
 
-Add the MCP server to your Claude Desktop configuration file:
+Add the MCP server to your MCP configuration file:
 
-**macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-**Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+Host-specific instructions:
+
+* [Claude Desktop](https://modelcontextprotocol.io/quickstart/user)
+* [Roo Code](https://docs.roocode.com/features/mcp/using-mcp-in-roo?_highlight=mcp)
+* [VS Code](https://code.visualstudio.com/docs/copilot/chat/mcp-servers)
+* [Windsurf](https://docs.windsurf.com/windsurf/cascade/mcp)
+* [Cursor](https://docs.cursor.com/context/model-context-protocol)
 
 ```json
 {
@@ -58,7 +61,7 @@ Add the MCP server to your Claude Desktop configuration file:
 }
 ```
 
-**Note**: If you set the token in the Claude Desktop config (recommended), you don't need a `.env` file. The token in the config takes precedence.
+**Note**: If you set the token in the host config json (recommended), you don't need a `.env` file. The token in the config takes precedence.
 
 ## Using the MCP Tool
 
@@ -73,7 +76,7 @@ Once configured, you can use the `render_diagram` tool in your client to generat
   - `entity-relationship-diagram`
 - `code` (required): Diagram code in Eraser syntax
 - `return_file` (optional, default: false): Whether to return base64 image data
-- `background` (optional, default: true): Include background in diagram
+- `background` (optional, default: false): Include background in diagram
 - `theme` (optional, default: "light"): Choose "light" or "dark" theme
 - `scale` (optional, default: "1"): Scale factor - "1", "2", or "3"
 
@@ -142,7 +145,7 @@ Response:
 1. **Diagram Code Formatting**: Use `\n` for line breaks in your diagram code
 2. **Special Characters**: Escape quotes and backslashes properly
 3. **Token Management**: The token is automatically loaded from the environment - no need to pass it explicitly
-4. **File Handling**: When `return_file=True`, you'll get base64 data that Claude can save to a file
+4. **File Handling**: When `return_file=True`, you'll get base64 data that the host can save to a file
 5. **Icon Validation**: The tool validates icon references and warns about undefined icons. Set `SKIP_ICON_CHECK=true` in the environment to disable this
 
 ### Common Diagram Types
