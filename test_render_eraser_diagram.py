@@ -18,6 +18,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from dotenv import load_dotenv
 from render_eraser_diagram import check_undefined_icons, render_diagram
 
+from render_eraser_diagram import check_undefined_icons, render_diagram
+
 # Load environment variables
 load_dotenv()
 
@@ -175,7 +177,7 @@ def test_cli_interface():
             "light",
             "--scale",
             "2",
-            "--background",
+            "--no-background",
             "--return-file",
         ],
         capture_output=True,
