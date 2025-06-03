@@ -8,15 +8,17 @@ Usage:
     python render_eraser_diagram.py --diagramType sequence-diagram --code "Alice -> Bob: Hello"
 """
 
-import os
-import sys
 import argparse
-import requests
 import base64
-import json
-import re
 import csv
+import json
+import os
+import re
+import sys
+
+import requests
 from dotenv import load_dotenv
+
 from server import mcp
 
 # Load environment variables
@@ -95,7 +97,7 @@ def render_diagram(
             "success": False,
             "message": "Error: ERASER_API_TOKEN not found in environment",
         }
-    
+
     # Validate scale parameter
     if str(scale) not in ["1", "2", "3"]:
         return {
@@ -142,24 +144,24 @@ def render_diagram(
     # Convert string booleans to actual booleans
     if isinstance(background, str):
         background_str = remove_quotes(background).lower()
-        background_value = background_str in ['true', '1', 'yes']
+        background = background_str in ["true", "1", "yes"]
     else:
-        background_value = bool(background)
+        background = bool(background)
 
     if isinstance(return_file, str):
         return_file_str = remove_quotes(return_file).lower()
-        return_file_value = return_file_str in ["true", "1", "yes"]
+        return_file = return_file_str in ["true", "1", "yes"]
     else:
-        return_file_value = bool(return_file)
+        return_file = bool(return_file)
 
     payload = {
         "elements": [
             {"type": "diagram", "diagramType": diagram_type, "code": processed_code}
         ],
-        "background": background_value,
+        "background": background,
         "theme": theme,
         "scale": scale,
-        "returnFile": return_file_value,
+        "returnFile": return_file,
     }
 
     headers = {
@@ -252,10 +254,10 @@ Examples:
         help="Diagram code in Eraser.io syntax (use \\n for line breaks)",
     )
     parser.add_argument(
-        "--background",
+        "--no-background",
         action="store_true",
-        default=True,
-        help="Include background in the diagram (defaults to True)",
+        default=False,
+        help="Disable background in the diagram (background is enabled by default)",
     )
     parser.add_argument(
         "--theme",
@@ -264,10 +266,10 @@ Examples:
         help="Theme for the diagram (defaults to light)",
     )
     parser.add_argument(
-        "--scale", 
+        "--scale",
         choices=["1", "2", "3"],
-        default="1", 
-        help="Scale factor for the diagram: 1, 2, or 3 (defaults to 1)"
+        default="1",
+        help="Scale factor for the diagram: 1, 2, or 3 (defaults to 1)",
     )
     parser.add_argument(
         "--return-file",
@@ -283,7 +285,7 @@ Examples:
         diagram_type=args.diagram_type,
         code=args.code,
         return_file=args.return_file,
-        background=args.background,
+        background=not args.no_background,
         theme=args.theme,
         scale=args.scale,
     )
