@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "eraser-io-mcp-server"
 version = "1.0.0"
-description = "MCP server for rendering diagrams using Eraser API"
+description = "Unofficial MCP server for rendering diagrams using Eraser API"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"
