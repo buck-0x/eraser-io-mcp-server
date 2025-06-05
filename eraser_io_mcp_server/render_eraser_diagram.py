@@ -18,6 +18,7 @@ import sys
 
 import requests
 from dotenv import load_dotenv
+
 from .server import mcp
 
 # Load environment variables
@@ -27,11 +28,16 @@ load_dotenv()
 STANDARD_ICONS = set()
 icon_csv_path = os.path.join(os.path.dirname(__file__), "eraser-standard-icons.csv")
 if os.path.exists(icon_csv_path):
-    with open(icon_csv_path, "r") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            if "icon_name" in row:
-                STANDARD_ICONS.add(row["icon_name"])
+    try:
+        with open(icon_csv_path, "r", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                if "icon_name" in row:
+                    STANDARD_ICONS.add(row["icon_name"])
+    except (OSError, csv.Error) as e:
+        # Log warning but continue without icon checking
+        if os.getenv("DEBUG"):
+            print(f"Warning: Could not load icon CSV file: {e}")
 
 
 def check_undefined_icons(code):
