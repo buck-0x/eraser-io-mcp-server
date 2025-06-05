@@ -1,26 +1,30 @@
-# Using Eraser MCP Server with Claude Code
+# Using Eraser MCP Server
 
-This guide explains how to use the Eraser MCP server with Claude Code to generate diagrams programmatically.
+This guide explains how to use the Eraser MCP server to generate diagrams programmatically.
 
-## Setup
+## Local Setup
 
 ### 1. Install the MCP Server
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/buck-0x/eraser-io-mcp-server
 cd eraser-io-mcp-server
 
 # Install dependencies
+# Using uv (fast Python package manager)
 uv pip install -e .
+
+# Or using standard pip
+pip install -e .
 ```
 
 ### 2. Get Your Eraser API Token
 
 You'll need an API token from Eraser. You can set it in one of two ways:
 
-**Option A: Environment Variable in Claude Desktop Config (Recommended)**
-Set it directly in the Claude Desktop configuration (see step 3).
+**Option A: Environment Variable in the host config (Recommended)**
+Set it directly in the host configuration json (see step 3).
 
 **Option B: Local .env File**
 Create a `.env` file in the project directory:
@@ -29,14 +33,19 @@ Create a `.env` file in the project directory:
 ERASER_API_TOKEN=your_token_here
 ```
 
-### 3. Configure Claude Desktop
+### 3. Configure Host
 
 **Important**: Requires Python 3.10 or higher.
 
-Add the MCP server to your Claude Desktop configuration file:
+Add the MCP server to your MCP configuration file:
 
-**macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-**Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+Host-specific instructions:
+
+* [Claude Desktop](https://modelcontextprotocol.io/quickstart/user)
+* [Roo Code](https://docs.roocode.com/features/mcp/using-mcp-in-roo?_highlight=mcp)
+* [VS Code](https://code.visualstudio.com/docs/copilot/chat/mcp-servers)
+* [Windsurf](https://docs.windsurf.com/windsurf/cascade/mcp)
+* [Cursor](https://docs.cursor.com/context/model-context-protocol)
 
 ```json
 {
@@ -52,26 +61,28 @@ Add the MCP server to your Claude Desktop configuration file:
 }
 ```
 
-**Note**: If you set the token in the Claude Desktop config (recommended), you don't need a `.env` file. The token in the config takes precedence.
+**Note**: If you set the token in the host config json (recommended), you don't need a `.env` file. The token in the config takes precedence.
 
-## Using the MCP Tool in Claude Code
+## Using the MCP Tool
 
-Once configured, you can use the `render_diagram` tool in Claude Code to generate diagrams.
+Once configured, you can use the `render_diagram` tool in your client to generate diagrams.
 
 ### Tool Parameters
 
 - `diagram_type` (required): Type of diagram to render
   - `sequence-diagram`
   - `cloud-architecture-diagram`
-  - `flowchart`
+  - `flowchart-diagram`
   - `entity-relationship-diagram`
 - `code` (required): Diagram code in Eraser syntax
 - `return_file` (optional, default: false): Whether to return base64 image data
-- `background` (optional, default: false): Include background in diagram
-- `theme` (optional, default: "dark"): Choose "light" or "dark" theme
-- `scale` (optional, default: "1"): Scale factor (1.0-5.0)
+- `background` (optional, default: true): Include background in diagram
+- `theme` (optional, default: "light"): Choose "light" or "dark" theme
+- `scale` (optional, default: "1"): Scale factor - "1", "2", or "3"
 
-### Example Usage in Claude Code
+**Known Issue**: The Eraser API has a caching bug where images are cached based only on the diagram code. Changing `theme` or `background` parameters without changing the code will return the previously cached image instead of generating a new one with the updated settings.
+
+### Example Usage
 
 #### Basic Sequence Diagram (returns URL)
 
@@ -79,7 +90,7 @@ Once configured, you can use the `render_diagram` tool in Claude Code to generat
 Please create a sequence diagram showing a user login flow using the Eraser tool.
 ```
 
-Claude will use:
+The host will use:
 
 ```python
 render_diagram(
@@ -99,13 +110,15 @@ Response:
 }
 ```
 
-#### Cloud Architecture Diagram with File Content
+Note: If undefined icons are detected, you may also see a `warning` field in the response.
+
+##### Cloud Architecture Diagram with File Content
 
 ```
 Create a cloud architecture diagram for a serverless app and return the image file content.
 ```
 
-Claude will use:
+The host will use:
 
 ```python
 render_diagram(
@@ -123,17 +136,17 @@ Response:
 {
   "success": true,
   "image_blob": "iVBORw0KGgoAAAANSUhEUgA...",
-  "create_eraser_file_url": "https://app.eraser.io/workspace/...",
   "message": "Successfully rendered cloud-architecture-diagram diagram"
 }
 ```
 
-### Tips for Claude Code Usage
+### Tips
 
 1. **Diagram Code Formatting**: Use `\n` for line breaks in your diagram code
 2. **Special Characters**: Escape quotes and backslashes properly
 3. **Token Management**: The token is automatically loaded from the environment - no need to pass it explicitly
-4. **File Handling**: When `return_file=True`, you'll get base64 data that Claude can save to a file
+4. **File Handling**: When `return_file=True`, you'll get base64 data that the host can save to a file
+5. **Icon Validation**: The tool validates icon references and warns about undefined icons. Set `SKIP_ICON_CHECK=true` in the environment to disable this
 
 ### Common Diagram Types
 
@@ -175,17 +188,31 @@ ECS Cluster -> RDS Database
 
 ## Troubleshooting
 
-1. **MCP Not Available**: Restart Claude Desktop after updating configuration
+1. **MCP Not Available**: Restart the MCP server in your host after updating configuration
 2. **Authentication Error**: Verify your ERASER_API_TOKEN is correct
 3. **Diagram Syntax Error**: Check Eraser documentation for correct syntax
 4. **No Response**: Enable debug mode with `DEBUG=1` in the environment
-5. **Python Version Error**: Ensure you have Python 3.13 or higher installed
+   ```json
+   {
+     "mcpServers": {
+       "eraser": {
+         "command": "python",
+         "args": ["/path/to/eraser-io-mcp-server/main.py"],
+         "env": {
+           "ERASER_API_TOKEN": "your_token_here",
+           "DEBUG": "1"
+         }
+       }
+     }
+   }
+   ```
+5. **Python Version Error**: Ensure you have Python 3.10 or higher installed
 
 ## Advanced Usage
 
 ### Batch Diagram Generation
 
-You can ask Claude to generate multiple related diagrams:
+You can ask your host (e.g. Claude Desktop) to generate multiple related diagrams:
 
 ```
 Create a complete system design with:
@@ -194,7 +221,7 @@ Create a complete system design with:
 3. A cloud architecture diagram for the deployment
 ```
 
-Claude will call the tool multiple times with appropriate parameters for each diagram type.
+The host will call the tool multiple times with appropriate parameters for each diagram type.
 
 ### Custom Themes and Styling
 
