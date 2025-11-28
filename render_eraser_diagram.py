@@ -115,6 +115,22 @@ def render_diagram(
     processed_code = processed_code.replace("\\'", "'")
     processed_code = processed_code.replace("\\\\", "\\")
 
+    # Strip diagram type header if present at the start of the code
+    # LLMs may include the diagram type as a first line
+    diagram_type_headers = [
+        "flowchart-diagram",
+        "sequence-diagram",
+        "cloud-architecture-diagram",
+        "entity-relationship-diagram",
+    ]
+    lines = processed_code.split("\n")
+    if lines and lines[0].strip().lower() in diagram_type_headers:
+        lines = lines[1:]
+        # Also strip any following empty lines
+        while lines and not lines[0].strip():
+            lines = lines[1:]
+        processed_code = "\n".join(lines)
+
     # Debug output to show processed code
     if os.getenv("DEBUG"):
         print(f"Processed code:\n{processed_code}")
