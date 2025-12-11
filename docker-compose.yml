@@ -1,0 +1,12 @@
+services:
+  eraser-mcp:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - ERASER_API_TOKEN=${ERASER_API_TOKEN}
+      - MCP_AUTH_TOKEN=${MCP_AUTH_TOKEN:-}
+      - MCP_TRANSPORT=http
+      - MCP_HOST=0.0.0.0
+      - MCP_PORT=8000
+    restart: unless-stopped

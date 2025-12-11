@@ -174,9 +174,98 @@ Using uv (fast Python package manager):
 uv pip install -e .
 ```
 
+## HTTP Transport (Streamable HTTP)
+
+The server supports both stdio (default) and Streamable HTTP transport for remote access.
+
+### Running with HTTP Transport
+
+```bash
+# Local HTTP server
+python main.py --transport http --port 8000
+
+# Server will be available at http://localhost:8000/mcp
+```
+
+### Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `ERASER_API_TOKEN` | (required) | Your Eraser.io API token |
+| `MCP_TRANSPORT` | `stdio` | Transport protocol: `stdio` or `http` |
+| `MCP_HOST` | `0.0.0.0` | Host to bind for HTTP transport |
+| `MCP_PORT` | `8000` | Port to bind for HTTP transport |
+| `MCP_AUTH_TOKEN` | (empty) | Bearer token for HTTP authentication (optional) |
+
+### Bearer Token Authentication
+
+To enable authentication for the HTTP endpoint, set `MCP_AUTH_TOKEN`:
+
+```bash
+export MCP_AUTH_TOKEN=your_secret_token
+python main.py --transport http
+```
+
+Clients must include the token in the `Authorization` header:
+
+```
+Authorization: Bearer your_secret_token
+```
+
+## Docker Deployment
+
+### Using Docker Compose (Recommended)
+
+1. Copy `.env.example` to `.env` and configure:
+
+   ```bash
+   cp .env.example .env
+   # Edit .env with your ERASER_API_TOKEN
+   ```
+
+2. Start the server:
+
+   ```bash
+   docker-compose up -d
+   ```
+
+3. The server will be available at `http://localhost:8000/mcp`
+
+### Using Docker Directly
+
+```bash
+# Build
+docker build -t eraser-mcp .
+
+# Run
+docker run -p 8000:8000 \
+  -e ERASER_API_TOKEN=your_token \
+  -e MCP_AUTH_TOKEN=optional_auth_token \
+  eraser-mcp
+```
+
+### Client Configuration for HTTP
+
+Configure your MCP client to connect via Streamable HTTP:
+
+```json
+{
+  "mcpServers": {
+    "eraser": {
+      "type": "streamable-http",
+      "url": "http://localhost:8000/mcp",
+      "headers": {
+        "Authorization": "Bearer your_auth_token"
+      }
+    }
+  }
+}
+```
+
 ## Troubleshooting
 
 - If you get an API error, check that your token in `.env` is valid
 - Use `DEBUG=1` to see how your code is being processed
 - Ensure proper escaping of special characters in your shell
 - If you see icon warnings, check if your icons are custom or set `SKIP_ICON_CHECK=true`
+- For HTTP transport issues, check that the port is not in use and firewall allows connections

@@ -9,6 +9,8 @@ dependencies = [
     "mcp[cli]>=1.9.1",
     "python-dotenv>=1.1.0",
     "requests>=2.32.3",
+    "uvicorn>=0.30.0",
+    "starlette>=0.40.0",
 ]
 
 [tool.setuptools]
