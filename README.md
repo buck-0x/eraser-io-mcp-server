@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/buck-0x-eraser-io-mcp-server-badge.png)](https://mseep.ai/app/buck-0x-eraser-io-mcp-server)
+
 # Eraser Diagram Renderer
 
 A Python MCP (Model Context Protocol) server and CLI tool to render diagrams using the [Eraser](https://www.eraser.io/) API.
